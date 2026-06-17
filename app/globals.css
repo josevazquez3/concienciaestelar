@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-gold: #b8860b;
+  --color-gold-light: #d4a017;
+  --color-navy: #1b2a4a;
+  --color-cream: #f5efe0;
+  --color-warm-white: #faf7f2;
+  --color-dark-navy: #1a2744;
+  --color-card-bg: rgba(255, 255, 255, 0.6);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-warm-white font-body text-navy antialiased;
+  }
+}
+
+@layer components {
+  .section-label {
+    @apply font-ui text-xs font-medium uppercase tracking-label text-navy/60;
+  }
+
+  .gold-separator {
+    @apply mx-auto h-px w-24 bg-gold/40;
+  }
+
+  .card-glass {
+    background: var(--color-card-bg);
+    @apply rounded-card border border-gold/30 backdrop-blur-sm;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-gold px-8 py-3 font-ui text-sm font-medium uppercase tracking-wider text-white transition-all duration-300 hover:bg-gold-light hover:shadow-lg;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-gold bg-transparent px-8 py-3 font-ui text-sm font-medium uppercase tracking-wider text-navy transition-all duration-300 hover:bg-gold/10;
+  }
+
+  .btn-outline-white {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-white/80 bg-transparent px-8 py-3 font-ui text-sm font-medium uppercase tracking-wider text-white transition-all duration-300 hover:bg-white/10;
+  }
+
+  .display-title {
+    @apply font-display text-3xl font-semibold leading-tight md:text-4xl lg:text-5xl;
+  }
+
+  .star-bullet::before {
+    content: "✦";
+    @apply mr-2 text-gold;
+  }
+
+  .input-field {
+    @apply w-full rounded-xl border border-gold/30 bg-white/80 px-4 py-3 font-body text-navy placeholder:text-navy/40 transition-colors focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/20;
+  }
+}
+
+/* Texturas de fondo */
+.texture-stars {
+  background-image:
+    radial-gradient(1px 1px at 20px 30px, rgba(255, 255, 255, 0.8), transparent),
+    radial-gradient(1px 1px at 40px 70px, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(1px 1px at 50px 160px, rgba(255, 255, 255, 0.6), transparent),
+    radial-gradient(1px 1px at 90px 40px, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(1px 1px at 130px 80px, rgba(255, 255, 255, 0.7), transparent),
+    radial-gradient(1.5px 1.5px at 160px 120px, rgba(212, 160, 23, 0.6), transparent),
+    radial-gradient(1px 1px at 200px 50px, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(1px 1px at 250px 140px, rgba(255, 255, 255, 0.4), transparent);
+  background-size: 300px 200px;
+}
+
+.texture-fabric {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23B8860B' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
