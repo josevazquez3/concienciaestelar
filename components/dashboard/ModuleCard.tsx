@@ -1,8 +1,8 @@
 import Link from "next/link";
-import type { DashboardModule } from "@/lib/dashboard-modules";
+import type { DashboardModuleCard } from "@/lib/dashboard-modules";
 
 interface ModuleCardProps {
-  module: DashboardModule;
+  module: DashboardModuleCard;
 }
 
 export function ModuleCard({ module }: ModuleCardProps) {
@@ -16,6 +16,11 @@ export function ModuleCard({ module }: ModuleCardProps) {
       <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gold/10 text-gold transition-colors group-hover:bg-gold group-hover:text-white">
         <Icon size={24} />
       </div>
+      {module.parentTitle && (
+        <p className="mb-1 font-ui text-[10px] uppercase tracking-label text-navy/50">
+          {module.parentTitle}
+        </p>
+      )}
       <h3 className="mb-2 break-words font-display text-base font-semibold text-navy sm:text-lg">
         {module.title}
       </h3>

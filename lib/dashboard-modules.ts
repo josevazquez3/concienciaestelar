@@ -3,6 +3,8 @@ import type { LucideIcon } from "lucide-react";
 import {
   Calendar,
   Eye,
+  FileSpreadsheet,
+  Landmark,
   LayoutDashboard,
   MessageCircle,
   Network,
@@ -11,8 +13,17 @@ import {
   Star,
   Users,
   Video,
+  Wallet,
   Wand2,
 } from "lucide-react";
+
+export type DashboardSubmodule = {
+  slug: string;
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  href: string;
+};
 
 export type DashboardModule = {
   slug: string;
@@ -21,6 +32,16 @@ export type DashboardModule = {
   icon: LucideIcon;
   adminOnly?: boolean;
   href: string;
+  children?: DashboardSubmodule[];
+};
+
+export type DashboardModuleCard = {
+  slug: string;
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  href: string;
+  parentTitle?: string;
 };
 
 export const dashboardModules: DashboardModule[] = [
@@ -39,6 +60,30 @@ export const dashboardModules: DashboardModule[] = [
     icon: Settings,
     adminOnly: true,
     href: "/dashboard/configuracion",
+  },
+  {
+    slug: "tesoreria",
+    title: "Tesorería",
+    description: "Gestión financiera, cuentas bancarias y extractos.",
+    icon: Wallet,
+    adminOnly: true,
+    href: "/dashboard/tesoreria/cuentas-bancarias",
+    children: [
+      {
+        slug: "cuentas-bancarias",
+        title: "Cuentas Bancarias",
+        description: "Gestión de cuentas para clasificación de movimientos.",
+        icon: Landmark,
+        href: "/dashboard/tesoreria/cuentas-bancarias",
+      },
+      {
+        slug: "extracto-banco",
+        title: "Extracto Banco",
+        description: "Gestión e importación de movimientos bancarios.",
+        icon: FileSpreadsheet,
+        href: "/dashboard/tesoreria/extracto-banco",
+      },
+    ],
   },
   {
     slug: "encuentros",
@@ -105,6 +150,47 @@ export function getModulesForRole(role: Role): DashboardModule[] {
   return dashboardModules.filter((m) => !m.adminOnly);
 }
 
+export function getModuleCardsForRole(role: Role): DashboardModuleCard[] {
+  const cards: DashboardModuleCard[] = [];
+
+  for (const mod of getModulesForRole(role)) {
+    if (mod.children?.length) {
+      for (const child of mod.children) {
+        cards.push({
+          slug: `${mod.slug}-${child.slug}`,
+          title: child.title,
+          description: child.description,
+          icon: child.icon,
+          href: child.href,
+          parentTitle: mod.title,
+        });
+      }
+      continue;
+    }
+
+    cards.push({
+      slug: mod.slug,
+      title: mod.title,
+      description: mod.description,
+      icon: mod.icon,
+      href: mod.href,
+    });
+  }
+
+  return cards;
+}
+
 export function getModuleBySlug(slug: string): DashboardModule | undefined {
   return dashboardModules.find((m) => m.slug === slug);
 }
+
+export function getTesoreriaSubmodule(
+  submodulo: string
+): (DashboardSubmodule & { parent: DashboardModule }) | undefined {
+  const parent = dashboardModules.find((m) => m.slug === "tesoreria");
+  const child = parent?.children?.find((c) => c.slug === submodulo);
+  if (!parent || !child) return undefined;
+  return { ...child, parent };
+}
+
+export { LayoutDashboard };

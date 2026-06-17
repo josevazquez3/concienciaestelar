@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import {
+  ChevronDown,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -12,7 +13,11 @@ import {
 import { useEffect, useState } from "react";
 import type { Role } from "@prisma/client";
 import { cn } from "@/lib/utils";
-import { getModulesForRole, type DashboardModule } from "@/lib/dashboard-modules";
+import {
+  getModulesForRole,
+  type DashboardModule,
+  type DashboardSubmodule,
+} from "@/lib/dashboard-modules";
 import { Logo } from "@/components/landing/Logo";
 
 interface DashboardSidebarProps {
@@ -109,14 +114,23 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
           </p>
 
           <ul className="space-y-1">
-            {modules.map((mod) => (
-              <SidebarLink
-                key={mod.slug}
-                module={mod}
-                active={pathname === mod.href}
-                onNavigate={() => setOpen(false)}
-              />
-            ))}
+            {modules.map((mod) =>
+              mod.children?.length ? (
+                <SidebarModuleGroup
+                  key={mod.slug}
+                  module={mod}
+                  pathname={pathname}
+                  onNavigate={() => setOpen(false)}
+                />
+              ) : (
+                <SidebarLink
+                  key={mod.slug}
+                  module={mod}
+                  active={pathname === mod.href}
+                  onNavigate={() => setOpen(false)}
+                />
+              )
+            )}
           </ul>
         </nav>
 
@@ -139,6 +153,95 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
         </div>
       </aside>
     </>
+  );
+}
+
+function SidebarModuleGroup({
+  module,
+  pathname,
+  onNavigate,
+}: {
+  module: DashboardModule;
+  pathname: string;
+  onNavigate: () => void;
+}) {
+  const groupActive = pathname.startsWith(`/dashboard/${module.slug}`);
+  const [expanded, setExpanded] = useState(groupActive);
+  const Icon = module.icon;
+
+  useEffect(() => {
+    if (groupActive) {
+      setExpanded(true);
+    }
+  }, [groupActive]);
+
+  return (
+    <li>
+      <button
+        type="button"
+        onClick={() => setExpanded((prev) => !prev)}
+        className={cn(
+          "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 font-ui text-sm transition-colors",
+          groupActive
+            ? "bg-gold/20 text-gold-light"
+            : "text-white/70 hover:bg-white/5 hover:text-white"
+        )}
+        aria-expanded={expanded}
+      >
+        <Icon size={18} className="shrink-0" />
+        <span className="min-w-0 flex-1 text-left leading-snug">{module.title}</span>
+        <ChevronDown
+          size={16}
+          className={cn(
+            "shrink-0 transition-transform",
+            expanded ? "rotate-180" : ""
+          )}
+        />
+      </button>
+
+      {expanded && (
+        <ul className="mt-1 space-y-0.5 border-l border-white/10 pl-3 ml-5">
+          {module.children!.map((child) => (
+            <SidebarChildLink
+              key={child.slug}
+              child={child}
+              active={pathname === child.href}
+              onNavigate={onNavigate}
+            />
+          ))}
+        </ul>
+      )}
+    </li>
+  );
+}
+
+function SidebarChildLink({
+  child,
+  active,
+  onNavigate,
+}: {
+  child: DashboardSubmodule;
+  active: boolean;
+  onNavigate: () => void;
+}) {
+  const Icon = child.icon;
+
+  return (
+    <li>
+      <Link
+        href={child.href}
+        onClick={onNavigate}
+        className={cn(
+          "flex items-center gap-2 rounded-lg px-3 py-2 font-ui text-xs transition-colors",
+          active
+            ? "bg-gold/15 text-gold-light"
+            : "text-white/60 hover:bg-white/5 hover:text-white"
+        )}
+      >
+        <Icon size={16} className="shrink-0" />
+        <span className="min-w-0 leading-snug">{child.title}</span>
+      </Link>
+    </li>
   );
 }
 

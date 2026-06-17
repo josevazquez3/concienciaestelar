@@ -85,3 +85,46 @@ model Video {
   @@index([date])
   @@index([enabled])
 }
+
+model BankAccount {
+  id            String         @id @default(cuid())
+  code          String         @unique
+  operatingCode String         @default("")
+  name          String
+  active        Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  movements     BankMovement[]
+
+  @@index([active])
+  @@index([name])
+  @@index([operatingCode])
+}
+
+model BankStatementConfig {
+  id                 String   @id @default("default")
+  initialBalance     Decimal  @default(0) @db.Decimal(18, 2)
+  initialBalanceDate DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model BankMovement {
+  id                String       @id @default(cuid())
+  movementDate      DateTime
+  branchCode        String       @default("")
+  branchDescription String       @default("")
+  operationCode     String       @default("")
+  reference         String       @default("")
+  concept           String
+  amount            Decimal      @db.Decimal(18, 2)
+  runningBalance    Decimal?     @db.Decimal(18, 2)
+  bankAccountId     String?
+  bankAccount       BankAccount? @relation(fields: [bankAccountId], references: [id], onDelete: SetNull)
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  @@index([movementDate])
+  @@index([bankAccountId])
+  @@index([operationCode])
+  @@index([reference])
+}

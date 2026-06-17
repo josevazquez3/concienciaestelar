@@ -24,6 +24,10 @@ export default async function ModuloPage({ params }: ModuloPageProps) {
     redirect("/dashboard");
   }
 
+  if (dashboardModule.children?.length) {
+    redirect(dashboardModule.children[0].href);
+  }
+
   if (params.modulo === "usuarios") {
     return (
       <ModulePageShell module={dashboardModule}>

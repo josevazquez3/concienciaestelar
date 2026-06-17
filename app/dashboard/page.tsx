@@ -1,10 +1,10 @@
 import { auth } from "@/lib/auth";
 import { ModuleCard } from "@/components/dashboard/ModuleCard";
-import { getModulesForRole } from "@/lib/dashboard-modules";
+import { getModuleCardsForRole } from "@/lib/dashboard-modules";
 
 export default async function DashboardHomePage() {
   const session = await auth();
-  const modules = getModulesForRole(session!.user.role);
+  const modules = getModuleCardsForRole(session!.user.role);
 
   return (
     <div className="min-w-0">
