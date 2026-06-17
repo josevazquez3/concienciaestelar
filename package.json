@@ -12,6 +12,7 @@
     "db:migrate:settings": "node scripts/run-settings-migration.mjs",
     "db:migrate:messages": "node scripts/run-whatsapp-messages-migration.mjs",
     "db:migrate:payment": "node scripts/run-payment-migration.mjs",
+    "db:migrate:videos": "node scripts/run-videos-migration.mjs",
     "postinstall": "prisma generate"
   },
   "dependencies": {

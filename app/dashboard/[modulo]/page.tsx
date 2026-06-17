@@ -6,6 +6,7 @@ import { ModulePageShell } from "@/components/dashboard/ModulePageShell";
 import { UsuariosPanel } from "@/components/admin/UsuariosPanel";
 import { ConfiguracionPanel } from "@/components/admin/ConfiguracionPanel";
 import { WhatsappModuleContent } from "@/components/dashboard/WhatsappModuleContent";
+import { VideosPanel } from "@/components/dashboard/VideosPanel";
 
 interface ModuloPageProps {
   params: { modulo: string };
@@ -43,6 +44,14 @@ export default async function ModuloPage({ params }: ModuloPageProps) {
     return (
       <ModulePageShell module={dashboardModule}>
         <ConfiguracionPanel />
+      </ModulePageShell>
+    );
+  }
+
+  if (params.modulo === "videos") {
+    return (
+      <ModulePageShell module={dashboardModule}>
+        <VideosPanel isAdmin={isAdmin(session)} />
       </ModulePageShell>
     );
   }
