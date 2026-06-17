@@ -7,10 +7,10 @@ export default async function DashboardHomePage() {
   const modules = getModulesForRole(session!.user.role);
 
   return (
-    <div>
-      <div className="mb-10">
+    <div className="min-w-0">
+      <div className="mb-8 sm:mb-10">
         <p className="section-label mb-2">Panel de membresía</p>
-        <h1 className="font-display text-3xl font-semibold text-navy">
+        <h1 className="break-words font-display text-2xl font-semibold text-navy sm:text-3xl">
           Bienvenido/a, {session?.user.name ?? "viajero estelar"}
         </h1>
         <p className="mt-2 font-body italic text-navy/70">

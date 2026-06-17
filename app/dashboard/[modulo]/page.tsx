@@ -4,6 +4,8 @@ import { getModuleBySlug } from "@/lib/dashboard-modules";
 import { isAdmin } from "@/lib/roles";
 import { ModulePageShell } from "@/components/dashboard/ModulePageShell";
 import { UsuariosPanel } from "@/components/admin/UsuariosPanel";
+import { ConfiguracionPanel } from "@/components/admin/ConfiguracionPanel";
+import { WhatsappModuleContent } from "@/components/dashboard/WhatsappModuleContent";
 
 interface ModuloPageProps {
   params: { modulo: string };
@@ -25,6 +27,22 @@ export default async function ModuloPage({ params }: ModuloPageProps) {
     return (
       <ModulePageShell module={dashboardModule}>
         <UsuariosPanel />
+      </ModulePageShell>
+    );
+  }
+
+  if (params.modulo === "whatsapp") {
+    return (
+      <ModulePageShell module={dashboardModule}>
+        <WhatsappModuleContent />
+      </ModulePageShell>
+    );
+  }
+
+  if (params.modulo === "configuracion") {
+    return (
+      <ModulePageShell module={dashboardModule}>
+        <ConfiguracionPanel />
       </ModulePageShell>
     );
   }

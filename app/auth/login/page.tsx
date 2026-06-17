@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function LoginPage() {
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center px-4 py-12">
+    <div className="relative flex min-h-[100dvh] flex-col items-center justify-center px-4 py-8 sm:py-12">
       <div
         className="absolute inset-0 -z-10"
         style={{
@@ -31,10 +31,10 @@ export default function LoginPage() {
           Volver al inicio
         </Link>
 
-        <div className="card-glass p-8 shadow-xl shadow-navy/10 md:p-10">
-          <div className="mb-8 flex flex-col items-center text-center">
+        <div className="card-glass p-6 shadow-xl shadow-navy/10 sm:p-8 md:p-10">
+          <div className="mb-6 flex flex-col items-center text-center sm:mb-8">
             <Logo size="md" />
-            <h1 className="mt-6 font-display text-2xl font-semibold text-navy">
+            <h1 className="mt-4 font-display text-xl font-semibold text-navy sm:mt-6 sm:text-2xl">
               Ingresar
             </h1>
             <GoldSeparator className="my-4" />

@@ -47,11 +47,14 @@ export function HeroSection() {
         </FadeIn>
 
         <FadeIn delay={400}>
-          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <a href="#precios" className="btn-primary">
+          <div className="flex w-full flex-col items-stretch justify-center gap-3 sm:w-auto sm:flex-row sm:items-center sm:gap-4">
+            <a href="#precios" className="btn-primary w-full sm:w-auto">
               ✦ Quiero Unirme
             </a>
-            <a href="#que-es" className="btn-outline border-white/60 text-white hover:bg-white/10">
+            <a
+              href="#que-es"
+              className="btn-outline w-full border-white/60 text-white hover:bg-white/10 sm:w-auto"
+            >
               Conocer Más
             </a>
           </div>

@@ -1,29 +1,41 @@
 import { Instagram, Mail, MessageCircle } from "lucide-react";
+import {
+  formatWhatsAppDisplay,
+  getWhatsAppConfig,
+  whatsappHref,
+} from "@/lib/whatsapp";
+import { getPaymentDetails } from "@/lib/payment-settings";
 import { FadeIn } from "./FadeIn";
+import { PaymentDetailsLines } from "./PaymentDetailsLines";
 import { GoldSeparator, SectionLabel } from "./SectionLabel";
 
-const canales = [
-  {
-    icon: MessageCircle,
-    titulo: "WhatsApp",
-    valor: "+54 9 2216 01-4212",
-    href: "https://wa.me/5492216014212",
-  },
-  {
-    icon: Instagram,
-    titulo: "Instagram",
-    valor: "@marcelo.lacasa",
-    href: "https://instagram.com/marcelo.lacasa",
-  },
-  {
-    icon: Mail,
-    titulo: "Email",
-    valor: "conscienciaestelar33@gmail.com",
-    href: "mailto:conscienciaestelar33@gmail.com",
-  },
-];
+export async function ContactoSection() {
+  const [{ number: whatsappNumber, messages }, paymentDetails] =
+    await Promise.all([getWhatsAppConfig(), getPaymentDetails()]);
+  const whatsappDisplay = formatWhatsAppDisplay(whatsappNumber);
+  const whatsappLink = whatsappHref(whatsappNumber, messages.contacto);
 
-export function ContactoSection() {
+  const canales = [
+    {
+      icon: MessageCircle,
+      titulo: "WhatsApp",
+      valor: whatsappDisplay,
+      href: whatsappLink,
+    },
+    {
+      icon: Instagram,
+      titulo: "Instagram",
+      valor: "@marcelo.lacasa",
+      href: "https://instagram.com/marcelo.lacasa",
+    },
+    {
+      icon: Mail,
+      titulo: "Email",
+      valor: "conscienciaestelar33@gmail.com",
+      href: "mailto:conscienciaestelar33@gmail.com",
+    },
+  ];
+
   return (
     <section id="contacto" className="bg-cream px-4 py-20 md:py-28">
       <div className="mx-auto max-w-5xl">
@@ -51,7 +63,7 @@ export function ContactoSection() {
                 <h3 className="mb-1 font-ui text-xs uppercase tracking-label text-navy/60">
                   {c.titulo}
                 </h3>
-                <p className="font-body text-sm font-medium text-navy">
+                <p className="break-words font-body text-sm font-medium text-navy">
                   {c.valor}
                 </p>
               </a>
@@ -70,11 +82,7 @@ export function ContactoSection() {
                 <p className="font-body text-sm text-navy/80">
                   Transferencia bancaria
                   <br />
-                  Alias:{" "}
-                  <span className="font-semibold text-navy">
-                    Conscienciaestelar33
-                  </span>
-                  <br />
+                  <PaymentDetailsLines details={paymentDetails} />
                   Monto:{" "}
                   <span className="font-semibold text-gold">$80.000 ARS/mes</span>
                 </p>

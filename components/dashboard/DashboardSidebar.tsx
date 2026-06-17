@@ -9,7 +9,7 @@ import {
   Menu,
   X,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Role } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import { getModulesForRole, type DashboardModule } from "@/lib/dashboard-modules";
@@ -27,6 +27,17 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const modules = getModulesForRole(user.role);
+
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
 
   return (
     <>
@@ -50,7 +61,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
 
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-gold/20 bg-navy-dark text-white transition-transform lg:static lg:translate-x-0",
+          "fixed inset-y-0 left-0 z-50 flex w-[min(18rem,85vw)] flex-col border-r border-gold/20 bg-navy-dark text-white transition-transform lg:static lg:w-72 lg:translate-x-0",
           open ? "translate-x-0" : "-translate-x-full"
         )}
       >
@@ -155,7 +166,7 @@ function SidebarLink({
         )}
       >
         <Icon size={18} className="shrink-0" />
-        <span className="leading-snug">{module.title}</span>
+        <span className="min-w-0 leading-snug">{module.title}</span>
       </Link>
     </li>
   );

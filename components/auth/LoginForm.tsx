@@ -33,7 +33,9 @@ export function LoginForm() {
       });
 
       if (result?.error) {
-        setError("Email o contraseña incorrectos.");
+        setError(
+          "No se pudo iniciar sesión. Verificá email y contraseña, o que la base de datos Neon esté configurada en .env.local."
+        );
         return;
       }
 
@@ -99,7 +101,7 @@ export function LoginForm() {
       </div>
 
       {error && (
-        <p className="rounded-xl border border-gold/30 bg-gold/10 px-4 py-3 font-body text-sm text-navy/80">
+        <p className="break-words rounded-xl border border-gold/30 bg-gold/10 px-4 py-3 font-body text-sm text-navy/80">
           {error}
         </p>
       )}

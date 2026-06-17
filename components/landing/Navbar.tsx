@@ -45,12 +45,12 @@ export function Navbar() {
       )}
     >
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-6 lg:px-8">
-        <Link href="/" className="shrink-0">
-          <Logo size="sm" />
+        <Link href="/" className="shrink-0" aria-label="Consciencia Estelar">
+          <Logo size="sm" hideTextOnMobile />
         </Link>
 
         {/* Desktop links */}
-        <ul className="hidden items-center gap-8 lg:flex">
+        <ul className="hidden items-center gap-6 md:gap-8 lg:flex">
           {navLinks.map((link) => (
             <li key={link.href}>
               <a
@@ -63,8 +63,11 @@ export function Navbar() {
           ))}
         </ul>
 
-        <div className="flex items-center gap-3">
-          <Link href="/auth/login" className="btn-primary hidden text-xs sm:inline-flex">
+        <div className="flex shrink-0 items-center gap-2">
+          <Link
+            href="/auth/login"
+            className="btn-primary shrink-0 px-4 py-2 text-[11px] sm:text-xs"
+          >
             Ingresar
           </Link>
 

@@ -9,21 +9,24 @@ export function ModulePageShell({ module, children }: ModulePageShellProps) {
   const Icon = module.icon;
 
   return (
-    <div>
-      <div className="mb-8 flex items-start gap-4">
-        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gold/10 text-gold">
-          <Icon size={28} />
+    <div className="min-w-0">
+      <div className="mb-6 flex flex-wrap items-start gap-4 sm:mb-8">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gold/10 text-gold sm:h-14 sm:w-14">
+          <Icon size={24} className="sm:hidden" />
+          <Icon size={28} className="hidden sm:block" />
         </div>
-        <div>
-          <h1 className="font-display text-2xl font-semibold text-navy md:text-3xl">
+        <div className="min-w-0 flex-1">
+          <h1 className="break-words font-display text-xl font-semibold text-navy sm:text-2xl md:text-3xl">
             {module.title}
           </h1>
-          <p className="mt-1 font-body text-navy/70">{module.description}</p>
+          <p className="mt-1 break-words font-body text-sm text-navy/70 sm:text-base">
+            {module.description}
+          </p>
         </div>
       </div>
 
       {children ?? (
-        <div className="card-glass p-8 text-center">
+        <div className="card-glass p-6 text-center sm:p-8">
           <p className="font-body italic text-navy/60">
             Este módulo está listo para cargar contenido, archivos y recursos.
           </p>

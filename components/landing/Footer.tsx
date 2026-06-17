@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Instagram, MessageCircle } from "lucide-react";
+import { getWhatsAppConfig, whatsappHref } from "@/lib/whatsapp";
 import { Logo } from "./Logo";
 
 const footerLinks = [
@@ -10,7 +11,10 @@ const footerLinks = [
   { href: "#contacto", label: "Contacto" },
 ];
 
-export function Footer() {
+export async function Footer() {
+  const { number: whatsappNumber, messages } = await getWhatsAppConfig();
+  const whatsappLink = whatsappHref(whatsappNumber, messages.contacto);
+
   return (
     <footer className="bg-navy-dark px-4 py-16 text-white">
       <div className="mx-auto max-w-4xl text-center">
@@ -57,7 +61,7 @@ export function Footer() {
             <Instagram size={20} />
           </a>
           <a
-            href="https://wa.me/5492216014212"
+            href={whatsappLink}
             target="_blank"
             rel="noopener noreferrer"
             className="rounded-full border border-white/20 p-3 text-white/70 transition-colors hover:border-gold hover:text-gold-light"

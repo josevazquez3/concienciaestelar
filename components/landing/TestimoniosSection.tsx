@@ -80,11 +80,11 @@ export function TestimoniosSection() {
             onMouseEnter={() => setPaused(true)}
             onMouseLeave={() => setPaused(false)}
           >
-            <div className="card-glass relative px-8 py-12 text-center md:px-16">
-              <span className="absolute left-6 top-4 font-display text-6xl leading-none text-gold/30 md:left-10 md:text-8xl">
+            <div className="card-glass relative px-5 py-10 text-center sm:px-8 sm:py-12 md:px-16">
+              <span className="pointer-events-none absolute left-4 top-3 font-display text-5xl leading-none text-gold/30 sm:left-6 sm:top-4 sm:text-6xl md:left-10 md:text-8xl">
                 &ldquo;
               </span>
-              <p className="relative z-10 mb-6 font-body text-lg italic leading-relaxed text-navy/85 md:text-xl">
+              <p className="relative z-10 mb-6 px-2 font-body text-base italic leading-relaxed text-navy/85 sm:text-lg md:text-xl">
                 {t?.texto}
               </p>
               <p className="font-ui text-sm font-medium uppercase tracking-label text-gold">
