@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS "Video" (
   "url" TEXT NOT NULL,
   "title" TEXT NOT NULL,
   "date" TIMESTAMP(3) NOT NULL,
+  "enabled" BOOLEAN NOT NULL DEFAULT true,
   "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -13,3 +14,4 @@ CREATE TABLE IF NOT EXISTS "Video" (
 );
 
 CREATE INDEX IF NOT EXISTS "Video_date_idx" ON "Video" ("date");
+CREATE INDEX IF NOT EXISTS "Video_enabled_idx" ON "Video" ("enabled");

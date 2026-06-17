@@ -47,6 +47,13 @@ export async function PATCH(request: Request, { params }: RouteParams) {
         )
       : undefined;
 
+  if (active === false && session?.user?.id === params.id) {
+    return NextResponse.json(
+      { error: "No podés desactivar tu propia cuenta" },
+      { status: 400 }
+    );
+  }
+
   const hashedPassword =
     password && password.length > 0 ? await hash(password, 12) : undefined;
 

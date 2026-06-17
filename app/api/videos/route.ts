@@ -3,6 +3,11 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { isAdmin } from "@/lib/roles";
 import { extractYouTubeId } from "@/lib/youtube";
+import {
+  parseVideoDate,
+  validateVideoTitle,
+  videoSelectFields,
+} from "@/lib/videos";
 
 export async function GET() {
   const session = await auth();
@@ -11,15 +16,9 @@ export async function GET() {
   }
 
   const videos = await prisma.video.findMany({
+    where: isAdmin(session) ? undefined : { enabled: true },
     orderBy: [{ date: "desc" }, { createdAt: "desc" }],
-    select: {
-      id: true,
-      youtubeId: true,
-      url: true,
-      title: true,
-      date: true,
-      createdAt: true,
-    },
+    select: videoSelectFields,
   });
 
   return NextResponse.json(videos);
@@ -53,16 +52,15 @@ export async function POST(request: Request) {
     );
   }
 
-  // Validación simple (letras/números + signos comunes). Evita regex unicode por compatibilidad TS.
-  if (!/^[A-Za-z0-9À-ÿ\u00C0-\u017F\s.,;:¿?¡!()'"-]{2,120}$/.test(title.trim())) {
+  if (!validateVideoTitle(title)) {
     return NextResponse.json(
       { error: "Título inválido (2 a 120 caracteres)" },
       { status: 400 }
     );
   }
 
-  const parsedDate = new Date(date);
-  if (Number.isNaN(parsedDate.getTime())) {
+  const parsedDate = parseVideoDate(date);
+  if (!parsedDate) {
     return NextResponse.json({ error: "Fecha inválida" }, { status: 400 });
   }
 
@@ -72,17 +70,10 @@ export async function POST(request: Request) {
       youtubeId,
       title: title.trim(),
       date: parsedDate,
+      enabled: true,
     },
-    select: {
-      id: true,
-      youtubeId: true,
-      url: true,
-      title: true,
-      date: true,
-      createdAt: true,
-    },
+    select: videoSelectFields,
   });
 
   return NextResponse.json(created);
 }
-

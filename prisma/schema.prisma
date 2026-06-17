@@ -78,8 +78,10 @@ model Video {
   url       String
   title     String
   date      DateTime
+  enabled   Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([date])
+  @@index([enabled])
 }
