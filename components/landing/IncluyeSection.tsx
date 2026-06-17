@@ -53,12 +53,14 @@ export function IncluyeSection() {
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {servicios.map((servicio, i) => (
             <FadeIn key={servicio.title} delay={i * 80}>
-              <div className="h-full rounded-card border border-white/30 bg-white/10 p-6 backdrop-blur-sm transition-transform duration-300 hover:-translate-y-1">
-                <span className="mb-3 block text-gold-light">✦</span>
+              <div className="group h-full rounded-card border border-white/30 bg-white/10 p-6 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-navy-dark hover:bg-navy-dark">
+                <span className="mb-3 block text-gold-light transition-colors duration-300 group-hover:text-white">
+                  ✦
+                </span>
                 <h3 className="mb-2 font-display text-lg font-semibold text-white">
                   {servicio.title}
                 </h3>
-                <p className="font-body text-sm leading-relaxed text-white/85">
+                <p className="font-body text-sm leading-relaxed text-white/85 transition-colors duration-300 group-hover:text-white">
                   {servicio.description}
                 </p>
               </div>

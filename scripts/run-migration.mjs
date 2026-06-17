@@ -35,4 +35,4 @@ execSync("npx prisma db execute --file ./migration.sql --schema prisma/schema.pr
   env: process.env,
 });
 
-console.log("\n✅ Migración completada. Corré: npm run check:env");
+console.log("\n✅ Migración base lista (segura de re-ejecutar). Corré: npm run check:env");
