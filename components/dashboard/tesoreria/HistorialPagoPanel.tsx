@@ -14,8 +14,8 @@ import {
 import {
   formatArs,
   formatMovementDateTime,
-} from "@/lib/bank-statement-config";
-import { HISTORIAL_PAGO_HEADERS } from "@/lib/historial-pago";
+} from "@/lib/bank-statement-shared";
+import { HISTORIAL_PAGO_HEADERS } from "@/lib/historial-pago-shared";
 import {
   downloadPdfTable,
   downloadXlsx,

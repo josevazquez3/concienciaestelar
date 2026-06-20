@@ -2,7 +2,7 @@ import {
   PAYMENT_FIELD_META,
   type PaymentDetails,
   type PaymentDetailKey,
-} from "@/lib/payment-settings";
+} from "@/lib/payment-settings-shared";
 
 const DISPLAY_ORDER: PaymentDetailKey[] = [
   "banco",

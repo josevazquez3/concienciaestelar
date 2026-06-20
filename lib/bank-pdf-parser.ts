@@ -1,4 +1,4 @@
-import { parseArsAmount } from "@/lib/bank-statement-config";
+import { parseArsAmount } from "@/lib/bank-statement-shared";
 
 export type ParsedPdfMovement = {
   fecha: string;

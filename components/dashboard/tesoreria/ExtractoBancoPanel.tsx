@@ -13,8 +13,8 @@ import {
   formatArs,
   formatMovementDateTime,
   formatStatementDate,
-} from "@/lib/bank-statement-config";
-import { MOVEMENT_CSV_HEADERS } from "@/lib/bank-movements";
+} from "@/lib/bank-statement-shared";
+import { MOVEMENT_CSV_HEADERS } from "@/lib/bank-movements-shared";
 import { downloadXlsx, xlsxFilename } from "@/lib/spreadsheet-export";
 import { readSpreadsheetAsCsv, EXTRACTO_IMPORT_ACCEPT } from "@/lib/spreadsheet-import";
 import { BankMovementModal } from "./BankMovementModal";

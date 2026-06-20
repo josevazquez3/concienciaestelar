@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { X } from "lucide-react";
-import { formatAmountForInput } from "@/lib/bank-statement-config";
+import { formatAmountForInput } from "@/lib/bank-statement-shared";
 
 type MovementDuplicateReason = "existing" | "file";
 

@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import {
@@ -6,7 +8,7 @@ import {
   formatMovementDateTime,
   parseArsAmount,
   parseMovementDate,
-} from "@/lib/bank-statement-config";
+} from "@/lib/bank-statement-shared";
 
 export const bankMovementSelect = {
   id: true,
@@ -120,16 +122,9 @@ export function computeTotalBalance(
   return initialBalance + net;
 }
 
-export const MOVEMENT_CSV_HEADERS = [
-  "Fecha",
-  "Suc.",
-  "Desc. Sucursal",
-  "Cód. Op.",
-  "Referencia",
-  "Concepto",
-  "Importe",
-  "Saldo",
-] as const;
+import { MOVEMENT_CSV_HEADERS } from "@/lib/bank-movements-shared";
+
+export { MOVEMENT_CSV_HEADERS } from "@/lib/bank-movements-shared";
 
 function escapeCsvValue(value: string): string {
   if (/[",\n\r]/.test(value)) {

@@ -13,14 +13,14 @@ import {
 import {
   formatArs,
   formatMovementDateTime,
-} from "@/lib/bank-statement-config";
+} from "@/lib/bank-statement-shared";
 import {
   downloadPdfTable,
   downloadXlsx,
   pdfFilename,
   xlsxFilename,
 } from "@/lib/spreadsheet-export";
-import { TRANSFERENCIAS_RECIBIDAS_HEADERS } from "@/lib/transferencias-recibidas";
+import { TRANSFERENCIAS_RECIBIDAS_HEADERS } from "@/lib/transferencias-recibidas-shared";
 import { BankMovementModal } from "./BankMovementModal";
 import { ConceptEditModal } from "./ConceptEditModal";
 import type { BankMovementItem } from "./ExtractoBancoPanel";

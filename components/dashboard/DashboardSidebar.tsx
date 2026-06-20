@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import {
   ChevronDown,
-  LayoutDashboard,
   LogOut,
   Menu,
   X,
@@ -18,6 +17,7 @@ import {
   type DashboardModule,
   type DashboardSubmodule,
 } from "@/lib/dashboard-modules";
+import { LayoutDashboard, ModuleIcon } from "@/components/dashboard/ModuleIcon";
 import { Logo } from "@/components/landing/Logo";
 
 interface DashboardSidebarProps {
@@ -166,14 +166,20 @@ function SidebarModuleGroup({
   onNavigate: () => void;
 }) {
   const groupActive = pathname.startsWith(`/dashboard/${module.slug}`);
-  const [expanded, setExpanded] = useState(groupActive);
-  const Icon = module.icon;
+  const [expanded, setExpanded] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (groupActive) {
       setExpanded(true);
     }
   }, [groupActive]);
+
+  const showChildren = mounted && expanded;
 
   return (
     <li>
@@ -188,7 +194,7 @@ function SidebarModuleGroup({
         )}
         aria-expanded={expanded}
       >
-        <Icon size={18} className="shrink-0" />
+        <ModuleIcon name={module.icon} size={18} className="shrink-0" />
         <span className="min-w-0 flex-1 text-left leading-snug">{module.title}</span>
         <ChevronDown
           size={16}
@@ -199,7 +205,7 @@ function SidebarModuleGroup({
         />
       </button>
 
-      {expanded && (
+      {showChildren && (
         <ul className="mt-1 space-y-0.5 border-l border-white/10 pl-3 ml-5">
           {module.children!.map((child) => (
             <SidebarChildLink
@@ -224,8 +230,6 @@ function SidebarChildLink({
   active: boolean;
   onNavigate: () => void;
 }) {
-  const Icon = child.icon;
-
   return (
     <li>
       <Link
@@ -238,7 +242,7 @@ function SidebarChildLink({
             : "text-white/60 hover:bg-white/5 hover:text-white"
         )}
       >
-        <Icon size={16} className="shrink-0" />
+        <ModuleIcon name={child.icon} size={16} className="shrink-0" />
         <span className="min-w-0 leading-snug">{child.title}</span>
       </Link>
     </li>
@@ -254,8 +258,6 @@ function SidebarLink({
   active: boolean;
   onNavigate: () => void;
 }) {
-  const Icon = module.icon;
-
   return (
     <li>
       <Link
@@ -268,7 +270,7 @@ function SidebarLink({
             : "text-white/70 hover:bg-white/5 hover:text-white"
         )}
       >
-        <Icon size={18} className="shrink-0" />
+        <ModuleIcon name={module.icon} size={18} className="shrink-0" />
         <span className="min-w-0 leading-snug">{module.title}</span>
       </Link>
     </li>

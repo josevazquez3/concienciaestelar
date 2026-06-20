@@ -12,6 +12,7 @@ import {
   Trash2,
   Video,
 } from "lucide-react";
+import { formatDateArgentina } from "@/lib/date-format";
 import { youtubeThumbnailUrl } from "@/lib/youtube";
 import { toDateInputValue } from "@/lib/videos";
 
@@ -25,13 +26,7 @@ type VideoItem = {
 };
 
 function formatDateShort(iso: string): string {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return iso;
-  return d.toLocaleDateString("es-AR", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
+  return formatDateArgentina(iso) || iso;
 }
 
 function matchesVideoSearch(item: VideoItem, query: string): boolean {

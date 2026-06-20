@@ -10,7 +10,7 @@ import {
   appendPaymentDetailsToMessage,
   type PaymentDetailKey,
   type PaymentDetails,
-} from "@/lib/payment-settings";
+} from "@/lib/payment-settings-shared";
 import {
   DEFAULT_WHATSAPP_MESSAGES,
   formatWhatsAppDisplay,
@@ -18,7 +18,7 @@ import {
   WHATSAPP_MESSAGE_META,
   whatsappHref,
   type WhatsAppMessageKey,
-} from "@/lib/whatsapp";
+} from "@/lib/whatsapp-shared";
 
 const MESSAGE_KEYS = Object.keys(
   WHATSAPP_MESSAGE_META

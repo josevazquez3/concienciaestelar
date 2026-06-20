@@ -1,4 +1,5 @@
 import type { DashboardModule } from "@/lib/dashboard-modules";
+import { ModuleIcon } from "@/components/dashboard/ModuleIcon";
 
 interface ModulePageShellProps {
   module: DashboardModule;
@@ -6,14 +7,12 @@ interface ModulePageShellProps {
 }
 
 export function ModulePageShell({ module, children }: ModulePageShellProps) {
-  const Icon = module.icon;
-
   return (
     <div className="min-w-0">
       <div className="mb-6 flex flex-wrap items-start gap-4 sm:mb-8">
         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gold/10 text-gold sm:h-14 sm:w-14">
-          <Icon size={24} className="sm:hidden" />
-          <Icon size={28} className="hidden sm:block" />
+          <ModuleIcon name={module.icon} size={24} className="sm:hidden" />
+          <ModuleIcon name={module.icon} size={28} className="hidden sm:block" />
         </div>
         <div className="min-w-0 flex-1">
           <h1 className="break-words font-display text-xl font-semibold text-navy sm:text-2xl md:text-3xl">

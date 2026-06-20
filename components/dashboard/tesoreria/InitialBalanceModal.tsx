@@ -6,7 +6,7 @@ import {
   formatAmountForInput,
   parseArsAmount,
   toDateInputValue,
-} from "@/lib/bank-statement-config";
+} from "@/lib/bank-statement-shared";
 
 interface InitialBalanceModalProps {
   initialBalance: number;

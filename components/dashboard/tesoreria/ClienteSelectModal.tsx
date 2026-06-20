@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Search, User, X } from "lucide-react";
-import { formatArs } from "@/lib/bank-statement-config";
-import type { ClienteHistorialPago } from "@/lib/historial-pago";
+import { formatArs } from "@/lib/bank-statement-shared";
+import type { ClienteHistorialPago } from "@/lib/historial-pago-shared";
 
 interface ClienteSelectModalProps {
   selectedClient?: string | null;

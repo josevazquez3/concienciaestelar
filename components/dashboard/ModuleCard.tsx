@@ -1,20 +1,19 @@
 import Link from "next/link";
 import type { DashboardModuleCard } from "@/lib/dashboard-modules";
+import { ModuleIcon } from "@/components/dashboard/ModuleIcon";
 
 interface ModuleCardProps {
   module: DashboardModuleCard;
 }
 
 export function ModuleCard({ module }: ModuleCardProps) {
-  const Icon = module.icon;
-
   return (
     <Link
       href={module.href}
       className="card-glass group flex h-full min-w-0 flex-col p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg sm:p-6"
     >
       <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gold/10 text-gold transition-colors group-hover:bg-gold group-hover:text-white">
-        <Icon size={24} />
+        <ModuleIcon name={module.icon} size={24} />
       </div>
       {module.parentTitle && (
         <p className="mb-1 font-ui text-[10px] uppercase tracking-label text-navy/50">

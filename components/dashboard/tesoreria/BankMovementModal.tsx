@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { X } from "lucide-react";
-import { toDateInputValue } from "@/lib/bank-statement-config";
+import { toDateInputValue } from "@/lib/bank-statement-shared";
 import type { BankMovementItem } from "./ExtractoBancoPanel";
 
 interface BankMovementModalProps {

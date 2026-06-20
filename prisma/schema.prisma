@@ -111,3 +111,21 @@ model BankMovement {
   @@index([operationCode])
   @@index([reference])
 }
+
+model PadronCliente {
+  id              String    @id @default(cuid())
+  nombres         String
+  apellidos       String
+  documento       String    @default("")
+  fechaNacimiento DateTime?
+  email           String    @default("")
+  celular         String    @default("")
+  residencia      String    @default("")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([nombres])
+  @@index([apellidos])
+  @@index([documento])
+  @@index([email])
+}
