@@ -1,4 +1,4 @@
-import type { BankAccount, Prisma } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import {
   decimalToNumber,
@@ -16,17 +16,9 @@ export const bankMovementSelect = {
   operationCode: true,
   reference: true,
   concept: true,
+  conceptEdited: true,
   amount: true,
   runningBalance: true,
-  bankAccountId: true,
-  bankAccount: {
-    select: {
-      id: true,
-      code: true,
-      name: true,
-      operatingCode: true,
-    },
-  },
   createdAt: true,
   updatedAt: true,
 } satisfies Prisma.BankMovementSelect;
@@ -39,15 +31,9 @@ export type BankMovementRecord = {
   operationCode: string;
   reference: string;
   concept: string;
+  conceptEdited: boolean;
   amount: number;
   runningBalance: number | null;
-  bankAccountId: string | null;
-  bankAccount: {
-    id: string;
-    code: string;
-    name: string;
-    operatingCode: string;
-  } | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -61,7 +47,6 @@ export type BankMovementInput = {
   concept: string;
   amount: number;
   runningBalance?: number | null;
-  bankAccountId?: string | null;
 };
 
 export function serializeMovement(
@@ -75,74 +60,20 @@ export function serializeMovement(
     operationCode: movement.operationCode,
     reference: movement.reference,
     concept: movement.concept,
+    conceptEdited: movement.conceptEdited,
     amount: decimalToNumber(movement.amount) ?? 0,
     runningBalance: decimalToNumber(movement.runningBalance),
-    bankAccountId: movement.bankAccountId,
-    bankAccount: movement.bankAccount,
     createdAt: movement.createdAt.toISOString(),
     updatedAt: movement.updatedAt.toISOString(),
   };
-}
-
-export function normalizeOperationCode(value: string): string {
-  return value.replace(/\s/g, "").trim();
-}
-
-export function matchBankAccountByOperationCode(
-  operationCode: string,
-  accounts: Pick<BankAccount, "id" | "operatingCode" | "active">[]
-): string | null {
-  const normalized = normalizeOperationCode(operationCode);
-  if (!normalized) return null;
-
-  const activeAccounts = accounts.filter((account) => account.active);
-
-  const exact = activeAccounts.find(
-    (account) => normalizeOperationCode(account.operatingCode) === normalized
-  );
-  if (exact) return exact.id;
-
-  const suffix = activeAccounts.find((account) => {
-    const accountCode = normalizeOperationCode(account.operatingCode);
-    return (
-      accountCode.endsWith(normalized) ||
-      normalized.endsWith(accountCode) ||
-      accountCode.includes(normalized)
-    );
-  });
-  return suffix?.id ?? null;
-}
-
-export async function resolveBankAccountId(
-  operationCode: string,
-  explicitId?: string | null
-): Promise<string | null> {
-  if (explicitId) {
-    const account = await prisma.bankAccount.findUnique({
-      where: { id: explicitId },
-      select: { id: true },
-    });
-    return account?.id ?? null;
-  }
-
-  const accounts = await prisma.bankAccount.findMany({
-    select: { id: true, operatingCode: true, active: true },
-  });
-
-  return matchBankAccountByOperationCode(operationCode, accounts);
 }
 
 export function buildMovementWhere(filters: {
   search?: string;
   from?: Date;
   to?: Date;
-  bankAccountId?: string;
 }): Prisma.BankMovementWhereInput {
   const where: Prisma.BankMovementWhereInput = {};
-
-  if (filters.bankAccountId) {
-    where.bankAccountId = filters.bankAccountId;
-  }
 
   if (filters.from || filters.to) {
     where.movementDate = {};
@@ -164,7 +95,6 @@ export function buildMovementWhere(filters: {
       { operationCode: { contains: search, mode: "insensitive" } },
       { branchCode: { contains: search, mode: "insensitive" } },
       { branchDescription: { contains: search, mode: "insensitive" } },
-      { bankAccount: { name: { contains: search, mode: "insensitive" } } },
     ];
   }
 
@@ -199,7 +129,6 @@ export const MOVEMENT_CSV_HEADERS = [
   "Concepto",
   "Importe",
   "Saldo",
-  "Cuenta",
 ] as const;
 
 function escapeCsvValue(value: string): string {
@@ -220,7 +149,6 @@ export function movementsToCsv(
     | "concept"
     | "amount"
     | "runningBalance"
-    | "bankAccount"
   >[]
 ): string {
   const lines = [
@@ -239,7 +167,6 @@ export function movementsToCsv(
             ? ""
             : formatArs(movement.runningBalance)
         ),
-        escapeCsvValue(movement.bankAccount?.name ?? ""),
       ].join(",")
     ),
   ];
@@ -273,10 +200,7 @@ function parseCsvRow(line: string): string[] {
   return values;
 }
 
-export function parseMovementsCsv(
-  text: string,
-  accounts: Pick<BankAccount, "id" | "name" | "operatingCode" | "active">[]
-): {
+export function parseMovementsCsv(text: string): {
   rows: BankMovementInput[];
   errors: string[];
 } {
@@ -306,7 +230,6 @@ export function parseMovementsCsv(
     (h) => h.includes("importe") || h.includes("monto")
   );
   const balanceIdx = header.findIndex((h) => h.includes("saldo"));
-  const accountIdx = header.findIndex((h) => h.includes("cuenta"));
 
   const useHeader = dateIdx >= 0 && conceptIdx >= 0 && amountIdx >= 0;
 
@@ -326,7 +249,6 @@ export function parseMovementsCsv(
     const concept = (useHeader ? cells[conceptIdx] : cells[5]) ?? "";
     const amountRaw = (useHeader ? cells[amountIdx] : cells[6]) ?? "";
     const balanceRaw = useHeader ? (cells[balanceIdx] ?? "") : (cells[7] ?? "");
-    const accountName = useHeader ? (cells[accountIdx] ?? "") : (cells[8] ?? "");
 
     if (!dateRaw && !concept && !amountRaw) return;
 
@@ -351,19 +273,6 @@ export function parseMovementsCsv(
       ? parseArsAmount(balanceRaw)
       : null;
 
-    let bankAccountId: string | null = null;
-    if (accountName.trim()) {
-      const byName = accounts.find(
-        (account) =>
-          account.active &&
-          account.name.toLowerCase() === accountName.trim().toLowerCase()
-      );
-      bankAccountId = byName?.id ?? null;
-    }
-    if (!bankAccountId) {
-      bankAccountId = matchBankAccountByOperationCode(operationCode, accounts);
-    }
-
     rows.push({
       movementDate,
       branchCode: branchCode.trim(),
@@ -373,7 +282,6 @@ export function parseMovementsCsv(
       concept: concept.trim(),
       amount,
       runningBalance,
-      bankAccountId,
     });
   });
 
@@ -383,11 +291,6 @@ export function parseMovementsCsv(
 export async function createMovement(
   input: BankMovementInput
 ): Promise<BankMovementRecord> {
-  const bankAccountId = await resolveBankAccountId(
-    input.operationCode ?? "",
-    input.bankAccountId
-  );
-
   const created = await prisma.bankMovement.create({
     data: {
       movementDate: input.movementDate,
@@ -398,7 +301,6 @@ export async function createMovement(
       concept: input.concept.trim(),
       amount: input.amount,
       runningBalance: input.runningBalance ?? null,
-      bankAccountId,
     },
     select: bankMovementSelect,
   });
@@ -412,22 +314,12 @@ export async function updateMovementRecord(
 ): Promise<BankMovementRecord> {
   const existing = await prisma.bankMovement.findUnique({
     where: { id },
-    select: { operationCode: true },
+    select: { concept: true },
   });
 
   if (!existing) {
     throw new Error("Movimiento no encontrado");
   }
-
-  const opCode =
-    input.operationCode !== undefined
-      ? input.operationCode
-      : existing.operationCode;
-
-  const bankAccountId = await resolveBankAccountId(
-    opCode,
-    input.bankAccountId !== undefined ? input.bankAccountId : undefined
-  );
 
   const updated = await prisma.bankMovement.update({
     where: { id },
@@ -445,17 +337,72 @@ export async function updateMovementRecord(
       ...(input.reference !== undefined
         ? { reference: input.reference.trim() }
         : {}),
-      ...(input.concept !== undefined ? { concept: input.concept.trim() } : {}),
+      ...(input.concept !== undefined
+        ? {
+            concept: input.concept.trim(),
+            ...(input.concept.trim() !== existing.concept
+              ? { conceptEdited: true }
+              : {}),
+          }
+        : {}),
       ...(input.amount !== undefined ? { amount: input.amount } : {}),
       ...(input.runningBalance !== undefined
         ? { runningBalance: input.runningBalance }
-        : {}),
-      ...(input.bankAccountId !== undefined || input.operationCode !== undefined
-        ? { bankAccountId }
         : {}),
     },
     select: bankMovementSelect,
   });
 
   return serializeMovement(updated);
+}
+
+export type MovementDuplicateReason = "existing" | "file";
+
+export type MovementDuplicateInfo = {
+  isDuplicate: boolean;
+  duplicateReason?: MovementDuplicateReason;
+};
+
+export async function findExistingMovementReferences(
+  references: string[]
+): Promise<Set<string>> {
+  const unique = Array.from(
+    new Set(references.map((ref) => ref.trim()).filter(Boolean))
+  );
+
+  if (unique.length === 0) return new Set();
+
+  const existing = await prisma.bankMovement.findMany({
+    where: { reference: { in: unique } },
+    select: { reference: true },
+  });
+
+  return new Set(existing.map((row) => row.reference));
+}
+
+export function annotateMovementDuplicates<T extends { ideOperacion: string }>(
+  movements: T[],
+  existingReferences: Set<string>
+): Array<T & MovementDuplicateInfo> {
+  const seenInFile = new Set<string>();
+
+  return movements.map((movement) => {
+    const reference = movement.ideOperacion.trim();
+
+    if (!reference) {
+      return { ...movement, isDuplicate: false };
+    }
+
+    if (seenInFile.has(reference)) {
+      return { ...movement, isDuplicate: true, duplicateReason: "file" };
+    }
+
+    seenInFile.add(reference);
+
+    if (existingReferences.has(reference)) {
+      return { ...movement, isDuplicate: true, duplicateReason: "existing" };
+    }
+
+    return { ...movement, isDuplicate: false };
+  });
 }

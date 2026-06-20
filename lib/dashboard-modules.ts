@@ -1,10 +1,11 @@
 import type { Role } from "@prisma/client";
 import type { LucideIcon } from "lucide-react";
 import {
+  ArrowDownLeft,
   Calendar,
   Eye,
   FileSpreadsheet,
-  Landmark,
+  History,
   LayoutDashboard,
   MessageCircle,
   Network,
@@ -64,24 +65,31 @@ export const dashboardModules: DashboardModule[] = [
   {
     slug: "tesoreria",
     title: "Tesorería",
-    description: "Gestión financiera, cuentas bancarias y extractos.",
+    description: "Gestión financiera y extractos bancarios.",
     icon: Wallet,
     adminOnly: true,
-    href: "/dashboard/tesoreria/cuentas-bancarias",
+    href: "/dashboard/tesoreria/extracto-banco",
     children: [
-      {
-        slug: "cuentas-bancarias",
-        title: "Cuentas Bancarias",
-        description: "Gestión de cuentas para clasificación de movimientos.",
-        icon: Landmark,
-        href: "/dashboard/tesoreria/cuentas-bancarias",
-      },
       {
         slug: "extracto-banco",
         title: "Extracto Banco",
         description: "Gestión e importación de movimientos bancarios.",
         icon: FileSpreadsheet,
         href: "/dashboard/tesoreria/extracto-banco",
+      },
+      {
+        slug: "transferencias-recibidas",
+        title: "Transferencias recibidas",
+        description: "Transferencias recibidas con importe positivo del extracto bancario.",
+        icon: ArrowDownLeft,
+        href: "/dashboard/tesoreria/transferencias-recibidas",
+      },
+      {
+        slug: "historial-pago",
+        title: "Historial de pago",
+        description: "Historial de transferencias recibidas por cliente.",
+        icon: History,
+        href: "/dashboard/tesoreria/historial-pago",
       },
     ],
   },

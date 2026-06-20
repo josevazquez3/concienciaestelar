@@ -27,10 +27,10 @@ for (const line of fs.readFileSync(envPath, "utf8").split("\n")) {
   process.env[key] = value;
 }
 
-console.log("Ejecutando migration-bank-accounts.sql en Neon...\n");
+console.log("Ejecutando migration-bank-movement-concept-edited.sql en Neon...\n");
 
 execSync(
-  "npx prisma db execute --file ./migration-bank-accounts.sql --schema prisma/schema.prisma",
+  "npx prisma db execute --file ./migration-bank-movement-concept-edited.sql --schema prisma/schema.prisma",
   {
     cwd: root,
     stdio: "inherit",
@@ -38,4 +38,4 @@ execSync(
   }
 );
 
-console.log("\n✅ Tabla de cuentas bancarias lista.");
+console.log("\n✅ Campo conceptEdited listo.");

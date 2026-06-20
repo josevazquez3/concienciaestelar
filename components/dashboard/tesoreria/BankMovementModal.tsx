@@ -3,18 +3,16 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import { toDateInputValue } from "@/lib/bank-statement-config";
-import type { BankAccountOption, BankMovementItem } from "./ExtractoBancoPanel";
+import type { BankMovementItem } from "./ExtractoBancoPanel";
 
 interface BankMovementModalProps {
   movement?: BankMovementItem | null;
-  accounts: BankAccountOption[];
   onClose: () => void;
   onSaved: (movement: BankMovementItem) => void;
 }
 
 export function BankMovementModal({
   movement,
-  accounts,
   onClose,
   onSaved,
 }: BankMovementModalProps) {
@@ -37,7 +35,6 @@ export function BankMovementModal({
       ? String(movement.runningBalance)
       : ""
   );
-  const [bankAccountId, setBankAccountId] = useState(movement?.bankAccountId ?? "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -86,7 +83,6 @@ export function BankMovementModal({
           concept,
           amount: parsedAmount,
           runningBalance: parsedBalance,
-          bankAccountId: bankAccountId || null,
         }),
       });
 
@@ -226,24 +222,6 @@ export function BankMovementModal({
               className="input-field"
               placeholder="Opcional"
             />
-          </div>
-          <div className="sm:col-span-2">
-            <label className="section-label mb-2 block" htmlFor="mv-account">
-              Cuenta
-            </label>
-            <select
-              id="mv-account"
-              value={bankAccountId}
-              onChange={(e) => setBankAccountId(e.target.value)}
-              className="input-field"
-            >
-              <option value="">Sin clasificar</option>
-              {accounts.map((account) => (
-                <option key={account.id} value={account.id}>
-                  {account.name}
-                </option>
-              ))}
-            </select>
           </div>
         </div>
 

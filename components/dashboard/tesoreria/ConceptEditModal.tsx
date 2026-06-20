@@ -2,37 +2,38 @@
 
 import { useState } from "react";
 import { X } from "lucide-react";
-import type { BankAccountOption, BankMovementItem } from "./ExtractoBancoPanel";
+import type { BankMovementItem } from "./ExtractoBancoPanel";
 
-interface OperationCodeModalProps {
+interface ConceptEditModalProps {
   movement: BankMovementItem;
-  accounts: BankAccountOption[];
   onClose: () => void;
   onSaved: (movement: BankMovementItem) => void;
 }
 
-export function OperationCodeModal({
+export function ConceptEditModal({
   movement,
-  accounts,
   onClose,
   onSaved,
-}: OperationCodeModalProps) {
-  const [operationCode, setOperationCode] = useState(movement.operationCode);
-  const [bankAccountId, setBankAccountId] = useState(movement.bankAccountId ?? "");
+}: ConceptEditModalProps) {
+  const [concept, setConcept] = useState(movement.concept);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
   async function handleSave() {
     setSaving(true);
     setError("");
+
+    if (!concept.trim()) {
+      setError("El concepto no puede estar vacío.");
+      setSaving(false);
+      return;
+    }
+
     try {
       const res = await fetch(`/api/admin/extracto-banco/movements/${movement.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          operationCode: operationCode.trim(),
-          bankAccountId: bankAccountId || null,
-        }),
+        body: JSON.stringify({ concept: concept.trim() }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Error al guardar");
@@ -52,10 +53,10 @@ export function OperationCodeModal({
         onClick={onClose}
         aria-label="Cerrar"
       />
-      <div className="relative z-10 w-full max-w-md rounded-t-2xl border border-gold/20 bg-warm-white p-5 shadow-xl sm:rounded-2xl sm:p-6">
+      <div className="relative z-10 w-full max-w-lg rounded-t-2xl border border-gold/20 bg-warm-white p-5 shadow-xl sm:rounded-2xl sm:p-6">
         <div className="mb-5 flex items-center justify-between">
           <h2 className="font-display text-lg font-semibold text-navy">
-            Editar código operativo
+            Editar concepto
           </h2>
           <button
             type="button"
@@ -67,38 +68,19 @@ export function OperationCodeModal({
           </button>
         </div>
 
-        <div className="space-y-4">
-          <div>
-            <label className="section-label mb-2 block" htmlFor="op-code">
-              Cód. Op.
-            </label>
-            <input
-              id="op-code"
-              type="text"
-              value={operationCode}
-              onChange={(e) => setOperationCode(e.target.value)}
-              className="input-field"
-              maxLength={40}
-            />
-          </div>
-          <div>
-            <label className="section-label mb-2 block" htmlFor="op-account">
-              Cuenta
-            </label>
-            <select
-              id="op-account"
-              value={bankAccountId}
-              onChange={(e) => setBankAccountId(e.target.value)}
-              className="input-field"
-            >
-              <option value="">Sin clasificar</option>
-              {accounts.map((account) => (
-                <option key={account.id} value={account.id}>
-                  {account.name}
-                </option>
-              ))}
-            </select>
-          </div>
+        <div>
+          <label className="section-label mb-2 block" htmlFor="movement-concept">
+            Concepto
+          </label>
+          <textarea
+            id="movement-concept"
+            value={concept}
+            onChange={(e) => setConcept(e.target.value)}
+            className="input-field min-h-[100px] resize-y"
+            maxLength={200}
+            rows={3}
+            autoFocus
+          />
         </div>
 
         {error && (
@@ -117,7 +99,7 @@ export function OperationCodeModal({
             disabled={saving}
             className="btn-primary w-full disabled:opacity-70 sm:w-auto"
           >
-            {saving ? "Guardando..." : "Guardar"}
+            {saving ? "Guardando..." : "Guardar concepto"}
           </button>
         </div>
       </div>

@@ -33,7 +33,6 @@ export async function PATCH(request: Request, { params }: RouteContext) {
     concept,
     amount,
     runningBalance,
-    bankAccountId,
   } = body as {
     movementDate?: string;
     branchCode?: string;
@@ -43,7 +42,6 @@ export async function PATCH(request: Request, { params }: RouteContext) {
     concept?: string;
     amount?: number;
     runningBalance?: number | null;
-    bankAccountId?: string | null;
   };
 
   let parsedDate: Date | undefined;
@@ -70,7 +68,6 @@ export async function PATCH(request: Request, { params }: RouteContext) {
       concept,
       amount,
       runningBalance,
-      bankAccountId,
     });
     return NextResponse.json(updated);
   } catch (error) {

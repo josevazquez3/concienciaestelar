@@ -4,8 +4,9 @@ import { getTesoreriaSubmodule } from "@/lib/dashboard-modules";
 import type { DashboardModule } from "@/lib/dashboard-modules";
 import { isAdmin } from "@/lib/roles";
 import { ModulePageShell } from "@/components/dashboard/ModulePageShell";
-import { CuentasBancariasPanel } from "@/components/dashboard/tesoreria/CuentasBancariasPanel";
 import { ExtractoBancoPanel } from "@/components/dashboard/tesoreria/ExtractoBancoPanel";
+import { TransferenciasRecibidasPanel } from "@/components/dashboard/tesoreria/TransferenciasRecibidasPanel";
+import { HistorialPagoPanel } from "@/components/dashboard/tesoreria/HistorialPagoPanel";
 
 interface TesoreriaPageProps {
   params: { submodulo: string };
@@ -35,8 +36,11 @@ export default async function TesoreriaSubmoduloPage({
 
   return (
     <ModulePageShell module={moduleForShell}>
-      {params.submodulo === "cuentas-bancarias" && <CuentasBancariasPanel />}
       {params.submodulo === "extracto-banco" && <ExtractoBancoPanel />}
+      {params.submodulo === "transferencias-recibidas" && (
+        <TransferenciasRecibidasPanel />
+      )}
+      {params.submodulo === "historial-pago" && <HistorialPagoPanel />}
     </ModulePageShell>
   );
 }

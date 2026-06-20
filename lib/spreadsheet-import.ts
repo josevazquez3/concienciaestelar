@@ -3,6 +3,8 @@ const EXCEL_EXTENSIONS = [".xlsx", ".xls"] as const;
 export const SPREADSHEET_ACCEPT =
   ".csv,.xlsx,.xls,text/csv,text/plain,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel";
 
+export const EXTRACTO_IMPORT_ACCEPT = `${SPREADSHEET_ACCEPT},.pdf,application/pdf`;
+
 function isExcelFile(file: File): boolean {
   const lower = file.name.toLowerCase();
   return EXCEL_EXTENSIONS.some((ext) => lower.endsWith(ext));

@@ -16,18 +16,14 @@ import {
 } from "@/lib/bank-statement-config";
 import { MOVEMENT_CSV_HEADERS } from "@/lib/bank-movements";
 import { downloadXlsx, xlsxFilename } from "@/lib/spreadsheet-export";
-import { readSpreadsheetAsCsv, SPREADSHEET_ACCEPT } from "@/lib/spreadsheet-import";
+import { readSpreadsheetAsCsv, EXTRACTO_IMPORT_ACCEPT } from "@/lib/spreadsheet-import";
 import { BankMovementModal } from "./BankMovementModal";
 import { InitialBalanceModal } from "./InitialBalanceModal";
-import { OperationCodeModal } from "./OperationCodeModal";
-
-export type BankAccountOption = {
-  id: string;
-  code: string;
-  name: string;
-  operatingCode: string;
-  active: boolean;
-};
+import { ConceptEditModal } from "./ConceptEditModal";
+import {
+  PdfImportPreviewModal,
+  type PdfPreviewData,
+} from "./PdfImportPreviewModal";
 
 export type BankMovementItem = {
   id: string;
@@ -37,15 +33,9 @@ export type BankMovementItem = {
   operationCode: string;
   reference: string;
   concept: string;
+  conceptEdited: boolean;
   amount: number;
   runningBalance: number | null;
-  bankAccountId: string | null;
-  bankAccount: {
-    id: string;
-    code: string;
-    name: string;
-    operatingCode: string;
-  } | null;
 };
 
 type StatementConfig = {
@@ -62,7 +52,6 @@ export function ExtractoBancoPanel() {
   const [config, setConfig] = useState<StatementConfig | null>(null);
   const [movements, setMovements] = useState<BankMovementItem[]>([]);
   const [totalBalance, setTotalBalance] = useState(0);
-  const [accounts, setAccounts] = useState<BankAccountOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [importMessage, setImportMessage] = useState("");
@@ -70,16 +59,16 @@ export function ExtractoBancoPanel() {
   const [search, setSearch] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
-  const [accountFilter, setAccountFilter] = useState("");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [importing, setImporting] = useState(false);
   const [editingConfig, setEditingConfig] = useState(false);
   const [editingMovement, setEditingMovement] = useState<BankMovementItem | null>(
     null
   );
-  const [editingOpCode, setEditingOpCode] = useState<BankMovementItem | null>(
+  const [editingConcept, setEditingConcept] = useState<BankMovementItem | null>(
     null
   );
+  const [pdfPreview, setPdfPreview] = useState<PdfPreviewData | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const defaultConfig = (): StatementConfig => ({
@@ -103,14 +92,6 @@ export function ExtractoBancoPanel() {
     setEditingConfig(true);
   };
 
-  const fetchAccounts = useCallback(async () => {
-    const res = await fetch("/api/admin/cuentas-bancarias");
-    if (res.ok) {
-      const data = await res.json();
-      setAccounts(data);
-    }
-  }, []);
-
   const fetchMovements = useCallback(async () => {
     setLoading(true);
     setError("");
@@ -119,7 +100,6 @@ export function ExtractoBancoPanel() {
       if (search.trim()) params.set("search", search.trim());
       if (fromDate) params.set("from", fromDate);
       if (toDate) params.set("to", toDate);
-      if (accountFilter) params.set("accountId", accountFilter);
 
       const res = await fetch(
         `/api/admin/extracto-banco/movements?${params.toString()}`
@@ -135,12 +115,11 @@ export function ExtractoBancoPanel() {
     } finally {
       setLoading(false);
     }
-  }, [search, fromDate, toDate, accountFilter]);
+  }, [search, fromDate, toDate]);
 
   useEffect(() => {
-    fetchAccounts();
     fetchConfig();
-  }, [fetchAccounts, fetchConfig]);
+  }, [fetchConfig]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -213,12 +192,38 @@ export function ExtractoBancoPanel() {
         movement.concept,
         movement.amount,
         movement.runningBalance,
-        movement.bankAccount?.name ?? "",
       ])
     );
   }
 
+  async function handleImportPdf(file: File) {
+    setImporting(true);
+    setImportMessage("");
+    setError("");
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/admin/extracto-banco/parse-pdf", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Error al leer el PDF");
+      setPdfPreview(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al importar PDF");
+    } finally {
+      setImporting(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
   async function handleImportFile(file: File) {
+    if (file.name.toLowerCase().endsWith(".pdf") || file.type === "application/pdf") {
+      await handleImportPdf(file);
+      return;
+    }
+
     setImporting(true);
     setImportMessage("");
     setError("");
@@ -268,7 +273,7 @@ export function ExtractoBancoPanel() {
           </div>
 
           <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-            <div className="grid flex-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid flex-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
               <div className="relative sm:col-span-2 lg:col-span-1">
                 <Search
                   size={16}
@@ -299,19 +304,6 @@ export function ExtractoBancoPanel() {
                 aria-label="Hasta"
                 title="Hasta"
               />
-              <select
-                value={accountFilter}
-                onChange={(e) => setAccountFilter(e.target.value)}
-                className="input-field"
-                aria-label="Filtrar por cuenta"
-              >
-                <option value="">Todas las cuentas</option>
-                {accounts.map((account) => (
-                  <option key={account.id} value={account.id}>
-                    {account.name}
-                  </option>
-                ))}
-              </select>
             </div>
 
             <div className="flex flex-wrap gap-2">
@@ -328,7 +320,7 @@ export function ExtractoBancoPanel() {
               <input
                 ref={fileInputRef}
                 type="file"
-                accept={SPREADSHEET_ACCEPT}
+                accept={EXTRACTO_IMPORT_ACCEPT}
                 className="hidden"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
@@ -349,7 +341,7 @@ export function ExtractoBancoPanel() {
                 onClick={() => fileInputRef.current?.click()}
                 disabled={importing}
                 className="btn-primary flex-1 text-xs sm:flex-none"
-                title="Importar CSV o Excel"
+                title="Importar CSV, Excel o PDF"
               >
                 <FolderInput size={16} />
                 {importing ? "Importando..." : "Importar"}
@@ -400,7 +392,7 @@ export function ExtractoBancoPanel() {
           </p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[1100px] text-left font-body text-sm">
+            <table className="w-full min-w-[720px] text-left font-body text-sm">
               <thead>
                 <tr className="border-b border-gold/20 bg-cream/50">
                   <th className="px-3 py-3">
@@ -415,15 +407,6 @@ export function ExtractoBancoPanel() {
                     Fecha
                   </th>
                   <th className="px-3 py-3 font-ui text-xs uppercase tracking-label text-navy/60">
-                    Suc.
-                  </th>
-                  <th className="px-3 py-3 font-ui text-xs uppercase tracking-label text-navy/60">
-                    Desc. Sucursal
-                  </th>
-                  <th className="px-3 py-3 font-ui text-xs uppercase tracking-label text-navy/60">
-                    Cód. Op.
-                  </th>
-                  <th className="px-3 py-3 font-ui text-xs uppercase tracking-label text-navy/60">
                     Referencia
                   </th>
                   <th className="px-3 py-3 font-ui text-xs uppercase tracking-label text-navy/60">
@@ -434,9 +417,6 @@ export function ExtractoBancoPanel() {
                   </th>
                   <th className="px-3 py-3 font-ui text-xs uppercase tracking-label text-navy/60">
                     Saldo
-                  </th>
-                  <th className="px-3 py-3 font-ui text-xs uppercase tracking-label text-navy/60">
-                    Cuenta
                   </th>
                   <th className="px-3 py-3 font-ui text-xs uppercase tracking-label text-navy/60">
                     Acciones
@@ -462,16 +442,16 @@ export function ExtractoBancoPanel() {
                     <td className="whitespace-nowrap px-3 py-2.5 text-navy/80">
                       {formatMovementDateTime(movement.movementDate)}
                     </td>
-                    <td className="px-3 py-2.5 text-navy/80">{movement.branchCode || "—"}</td>
-                    <td className="max-w-[120px] truncate px-3 py-2.5 text-navy/80" title={movement.branchDescription}>
-                      {truncate(movement.branchDescription || "—", 12)}
-                    </td>
-                    <td className="px-3 py-2.5 text-navy/80">
-                      {movement.operationCode || "—"}
-                    </td>
                     <td className="px-3 py-2.5 text-navy/80">{movement.reference || "—"}</td>
-                    <td className="max-w-[180px] truncate px-3 py-2.5 text-navy" title={movement.concept}>
-                      {truncate(movement.concept, 30)}
+                    <td
+                      className={`max-w-[280px] truncate px-3 py-2.5 ${
+                        movement.conceptEdited
+                          ? "rounded-md bg-sky-100 font-medium text-sky-800"
+                          : "text-navy"
+                      }`}
+                      title={movement.concept}
+                    >
+                      {truncate(movement.concept, 40)}
                     </td>
                     <td
                       className={`whitespace-nowrap px-3 py-2.5 font-medium ${
@@ -486,15 +466,6 @@ export function ExtractoBancoPanel() {
                         : formatArs(movement.runningBalance)}
                     </td>
                     <td className="px-3 py-2.5">
-                      {movement.bankAccount ? (
-                        <span className="inline-block rounded-full bg-green-600 px-2.5 py-1 text-xs font-medium text-white">
-                          {truncate(movement.bankAccount.name, 22)}
-                        </span>
-                      ) : (
-                        <span className="text-navy/40">—</span>
-                      )}
-                    </td>
-                    <td className="px-3 py-2.5">
                       <div className="flex gap-1">
                         <button
                           type="button"
@@ -507,10 +478,10 @@ export function ExtractoBancoPanel() {
                         </button>
                         <button
                           type="button"
-                          onClick={() => setEditingOpCode(movement)}
+                          onClick={() => setEditingConcept(movement)}
                           className="rounded-lg p-2 text-navy/60 transition-colors hover:bg-gold/10 hover:text-gold"
-                          aria-label="Editar código operativo"
-                          title="Editar Código Operativo"
+                          aria-label="Editar concepto"
+                          title="Editar concepto"
                         >
                           <Hash size={16} />
                         </button>
@@ -533,6 +504,19 @@ export function ExtractoBancoPanel() {
         )}
       </div>
 
+      {pdfPreview && (
+        <PdfImportPreviewModal
+          preview={pdfPreview}
+          onClose={() => setPdfPreview(null)}
+          onImported={(message) => {
+            setImportMessage(message);
+            setPdfPreview(null);
+            fetchConfig();
+            fetchMovements();
+          }}
+        />
+      )}
+
       {editingConfig && (
         <InitialBalanceModal
           initialBalance={statementConfig.initialBalance}
@@ -552,7 +536,6 @@ export function ExtractoBancoPanel() {
       {editingMovement && (
         <BankMovementModal
           movement={editingMovement}
-          accounts={accounts}
           onClose={() => setEditingMovement(null)}
           onSaved={() => {
             setEditingMovement(null);
@@ -561,13 +544,12 @@ export function ExtractoBancoPanel() {
         />
       )}
 
-      {editingOpCode && (
-        <OperationCodeModal
-          movement={editingOpCode}
-          accounts={accounts}
-          onClose={() => setEditingOpCode(null)}
+      {editingConcept && (
+        <ConceptEditModal
+          movement={editingConcept}
+          onClose={() => setEditingConcept(null)}
           onSaved={() => {
-            setEditingOpCode(null);
+            setEditingConcept(null);
             fetchMovements();
           }}
         />
