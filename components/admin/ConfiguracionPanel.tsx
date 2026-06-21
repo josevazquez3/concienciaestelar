@@ -20,9 +20,11 @@ import {
   type WhatsAppMessageKey,
 } from "@/lib/whatsapp-shared";
 
-const MESSAGE_KEYS = Object.keys(
-  WHATSAPP_MESSAGE_META
-) as WhatsAppMessageKey[];
+const MESSAGE_KEYS = (
+  ["contacto", "membresia", "proceso"] as const
+) satisfies readonly WhatsAppMessageKey[];
+
+const PAGOS_DEL_MES_MESSAGE_KEY = "pagosDelMes" as const;
 
 const PAYMENT_KEYS = Object.keys(
   PAYMENT_FIELD_META
@@ -225,6 +227,48 @@ export function ConfiguracionPanel() {
               </a>
             </div>
           )}
+        </div>
+      </div>
+
+      <div className="card-glass p-4 sm:p-6">
+        <div className="mb-6 flex flex-wrap items-start gap-3">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-green-100 text-green-700">
+            <MessageCircle size={24} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <h2 className="font-display text-lg font-semibold text-navy">
+              Mensajes Pago del Mes
+            </h2>
+            <p className="font-body text-sm text-navy/60">
+              Texto predeterminado al contactar clientes desde Tesorería → Pagos
+              del Mes. Podés usar {"{nombres}"}, {"{apellidos}"} y {"{mes}"}.
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <label
+            className="section-label mb-2 block"
+            htmlFor="whatsapp-message-pagos-del-mes"
+          >
+            {WHATSAPP_MESSAGE_META.pagosDelMes.label}
+          </label>
+          <textarea
+            id="whatsapp-message-pagos-del-mes"
+            value={messages.pagosDelMes}
+            onChange={(e) => updateMessage("pagosDelMes", e.target.value)}
+            rows={4}
+            maxLength={MAX_WHATSAPP_MESSAGE_LENGTH}
+            className="input-field min-h-[100px] resize-y"
+          />
+          <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+            <p className="font-body text-xs text-navy/50">
+              {WHATSAPP_MESSAGE_META.pagosDelMes.hint}
+            </p>
+            <p className="font-ui text-xs text-navy/40">
+              {messages.pagosDelMes.length}/{MAX_WHATSAPP_MESSAGE_LENGTH}
+            </p>
+          </div>
         </div>
       </div>
 

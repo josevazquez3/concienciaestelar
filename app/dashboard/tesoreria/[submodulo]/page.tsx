@@ -7,6 +7,7 @@ import { ModulePageShell } from "@/components/dashboard/ModulePageShell";
 import { ExtractoBancoPanel } from "@/components/dashboard/tesoreria/ExtractoBancoPanel";
 import { TransferenciasRecibidasPanel } from "@/components/dashboard/tesoreria/TransferenciasRecibidasPanel";
 import { HistorialPagoPanel } from "@/components/dashboard/tesoreria/HistorialPagoPanel";
+import { PagosDelMesPanel } from "@/components/dashboard/tesoreria/PagosDelMesPanel";
 
 interface TesoreriaPageProps {
   params: { submodulo: string };
@@ -41,6 +42,7 @@ export default async function TesoreriaSubmoduloPage({
         <TransferenciasRecibidasPanel />
       )}
       {params.submodulo === "historial-pago" && <HistorialPagoPanel />}
+      {params.submodulo === "pagos-del-mes" && <PagosDelMesPanel />}
     </ModulePageShell>
   );
 }

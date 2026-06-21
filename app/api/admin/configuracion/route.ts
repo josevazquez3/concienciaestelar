@@ -50,21 +50,34 @@ export async function PATCH(request: Request) {
     paymentDetails?: Partial<PaymentDetails>;
   };
 
-  if (!whatsappNumber?.trim()) {
+  if (!whatsappNumber?.trim() && !whatsappMessages && !paymentDetails) {
     return NextResponse.json(
-      { error: "El número de WhatsApp es obligatorio" },
+      { error: "No hay datos para actualizar" },
       { status: 400 }
     );
   }
 
-  if (!isValidWhatsAppNumber(whatsappNumber)) {
-    return NextResponse.json(
-      {
-        error:
-          "Número inválido. Usá el formato +5492216014212 (10 a 15 dígitos).",
-      },
-      { status: 400 }
-    );
+  let savedNumber = (await getWhatsAppConfig()).number;
+
+  if (whatsappNumber !== undefined) {
+    if (!whatsappNumber.trim()) {
+      return NextResponse.json(
+        { error: "El número de WhatsApp es obligatorio" },
+        { status: 400 }
+      );
+    }
+
+    if (!isValidWhatsAppNumber(whatsappNumber)) {
+      return NextResponse.json(
+        {
+          error:
+            "Número inválido. Usá el formato +5492216014212 (10 a 15 dígitos).",
+        },
+        { status: 400 }
+      );
+    }
+
+    savedNumber = await setWhatsAppNumber(whatsappNumber);
   }
 
   if (whatsappMessages) {
@@ -93,7 +106,6 @@ export async function PATCH(request: Request) {
     }
   }
 
-  const savedNumber = await setWhatsAppNumber(whatsappNumber);
   const savedMessages = whatsappMessages
     ? await setWhatsAppMessages(whatsappMessages)
     : (await getWhatsAppConfig()).messages;

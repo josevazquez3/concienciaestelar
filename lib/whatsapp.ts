@@ -58,6 +58,9 @@ export async function getWhatsAppMessages(): Promise<
       proceso:
         map.get(WHATSAPP_MESSAGE_KEYS.proceso) ??
         DEFAULT_WHATSAPP_MESSAGES.proceso,
+      pagosDelMes:
+        map.get(WHATSAPP_MESSAGE_KEYS.pagosDelMes) ??
+        DEFAULT_WHATSAPP_MESSAGES.pagosDelMes,
     };
   } catch {
     return { ...DEFAULT_WHATSAPP_MESSAGES };
@@ -87,6 +90,9 @@ export async function getWhatsAppConfig(): Promise<{
         proceso:
           map.get(WHATSAPP_MESSAGE_KEYS.proceso) ??
           DEFAULT_WHATSAPP_MESSAGES.proceso,
+        pagosDelMes:
+          map.get(WHATSAPP_MESSAGE_KEYS.pagosDelMes) ??
+          DEFAULT_WHATSAPP_MESSAGES.pagosDelMes,
       },
     };
   } catch {

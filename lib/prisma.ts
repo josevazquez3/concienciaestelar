@@ -40,12 +40,22 @@ function isConnectionError(error: unknown): boolean {
   );
 }
 
+function resolveDatabaseUrl(): string | undefined {
+  const isDev = process.env.NODE_ENV === "development";
+  const raw =
+    isDev && process.env.DIRECT_URL?.trim()
+      ? process.env.DIRECT_URL
+      : process.env.DATABASE_URL;
+
+  return normalizeDatabaseUrl(raw);
+}
+
 function createPrismaClient() {
   const base = new PrismaClient({
-    log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
+    log: process.env.NODE_ENV === "development" ? ["warn"] : ["error"],
     datasources: {
       db: {
-        url: normalizeDatabaseUrl(process.env.DATABASE_URL),
+        url: resolveDatabaseUrl(),
       },
     },
   });

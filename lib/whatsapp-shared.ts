@@ -5,6 +5,7 @@ export const WHATSAPP_MESSAGE_KEYS = {
   contacto: "whatsapp_message_contacto",
   membresia: "whatsapp_message_membresia",
   proceso: "whatsapp_message_proceso",
+  pagosDelMes: "whatsapp_message_pagos_del_mes",
 } as const;
 
 export type WhatsAppMessageKey = keyof typeof WHATSAPP_MESSAGE_KEYS;
@@ -15,6 +16,8 @@ export const DEFAULT_WHATSAPP_MESSAGES: Record<WhatsAppMessageKey, string> = {
   membresia:
     "Hola, quiero unirme a la membresía de Consciencia Estelar (Argentina).",
   proceso: "Hola, quiero comenzar mi proceso en Consciencia Estelar.",
+  pagosDelMes:
+    "Hola {nombres}, te escribimos desde Consciencia Estelar para recordarte el pago de la membresía correspondiente a {mes}. Gracias.",
 };
 
 export const WHATSAPP_MESSAGE_META: Record<
@@ -32,6 +35,10 @@ export const WHATSAPP_MESSAGE_META: Record<
   proceso: {
     label: "Comenzar mi proceso",
     hint: "Botón principal al final de la sección de precios.",
+  },
+  pagosDelMes: {
+    label: "Pago del Mes",
+    hint: "Mensaje predeterminado al contactar clientes desde Tesorería → Pagos del Mes. Podés usar {nombres}, {apellidos} y {mes}.",
   },
 };
 
@@ -62,4 +69,26 @@ export function isValidWhatsAppNumber(number: string): boolean {
 export function isValidWhatsAppMessage(message: string): boolean {
   const trimmed = message.trim();
   return trimmed.length > 0 && trimmed.length <= MAX_WHATSAPP_MESSAGE_LENGTH;
+}
+
+export function applyPagosDelMesMessageTemplate(
+  template: string,
+  vars: { nombres: string; apellidos: string; mes: string }
+): string {
+  return template
+    .replace(/\{nombres\}/g, vars.nombres)
+    .replace(/\{apellidos\}/g, vars.apellidos)
+    .replace(/\{mes\}/g, vars.mes);
+}
+
+/** Normaliza celular del padrón para wa.me (Argentina: agrega 549 si falta código país). */
+export function normalizeClienteCelularForWhatsApp(celular: string): string {
+  const digits = normalizeWhatsAppNumber(celular);
+  if (!digits) return "";
+
+  if (digits.startsWith("54")) return digits;
+  if (digits.length === 10) return `549${digits}`;
+  if (digits.length === 11 && digits.startsWith("9")) return `54${digits}`;
+
+  return digits;
 }

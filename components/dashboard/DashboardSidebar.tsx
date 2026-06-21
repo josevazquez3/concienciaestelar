@@ -10,7 +10,7 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import type { Role } from "@prisma/client";
+import type { AppRole } from "@/lib/roles-shared";
 import { cn } from "@/lib/utils";
 import {
   getModulesForRole,
@@ -24,7 +24,7 @@ interface DashboardSidebarProps {
   user: {
     name?: string | null;
     email?: string | null;
-    role: Role;
+    role: AppRole;
   };
 }
 

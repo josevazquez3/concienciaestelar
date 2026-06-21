@@ -4,8 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "dev:clean": "node scripts/clean-next.mjs && next dev",
-    "build": "prisma generate && next build",
+    "dev:clean": "node scripts/stop-dev.mjs && node scripts/clean-next.mjs && next dev",
+    "prebuild": "node scripts/stop-dev.mjs",
+    "build": "next build",
+    "db:generate": "prisma generate",
+    "check:client-imports": "node scripts/check-client-imports.mjs",
     "start": "next start",
     "lint": "next lint",
     "check:env": "node scripts/check-setup.mjs",
@@ -35,6 +38,7 @@
     "pdf-parse": "^2.4.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "server-only": "^0.0.1",
     "tailwind-merge": "^2.6.0",
     "xlsx": "^0.18.5"
   },

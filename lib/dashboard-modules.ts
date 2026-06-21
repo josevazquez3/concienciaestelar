@@ -117,6 +117,14 @@ export const dashboardModules: DashboardModule[] = [
         icon: "history",
         href: "/dashboard/tesoreria/historial-pago",
       },
+      {
+        slug: "pagos-del-mes",
+        title: "Pagos del Mes",
+        description:
+          "Control mensual de pagos cruzando padrón de clientes y transferencias.",
+        icon: "calendar",
+        href: "/dashboard/tesoreria/pagos-del-mes",
+      },
     ],
   },
   {
